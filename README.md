@@ -22,7 +22,7 @@ A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the d
 
 ### Prerequisites
 
-1. **Create a Fireworks account** and install firectl: [Setup Instructions](https://docs.fireworks.ai/tools-sdks/firectl/firectl)
+1. **Create a Fireworks account**: [https://app.fireworks.ai/account/home](https://app.fireworks.ai/account/home)
 
 2. **Set up API keys in Fireworks Secrets**: Navigate to [fireworks.ai/settings/secrets](https://fireworks.ai/settings/secrets) and add:
    - `FIREWORKS_API_KEY` - Your Fireworks API key (same as the one you'll export locally)
@@ -98,49 +98,35 @@ In this example, we showcase a **Vercel TypeScript server** that executes single
 
 ## Training Pipeline
 
-### 1. Create Dataset
-
-Upload the SVGBench dataset to Fireworks:
-
-```bash
-firectl create dataset svgbench-dataset evaluator/svgbench_dataset.jsonl
-```
-
-### 2. Upload Evaluator
+### 1. Upload Evaluator
 
 Deploy your evaluation logic:
 
 ```bash
 cd evaluator
 eval-protocol upload --entry "test_svgagent::test_svg_generation_evaluation"
+cd ..
 ```
 
 Monitor the evaluator build status at: https://app.fireworks.ai/dashboard/evaluators/test-svgagent-test-svg-generation-evaluation
 
 > **Note**: Wait for the evaluator status to change from "Building" to "Active" before proceeding (typically takes a few minutes).
 
-### 3. Launch Reinforcement Fine Tuning
+### 2. Launch Reinforcement Fine Tuning
 
 Start the RFT training job:
 
 ```bash
 eval-protocol create rft \
   --base-model accounts/fireworks/models/qwen3-0p6b \
-  --dataset-id svgbench-dataset \
-  --output-model svgagent-rft-v1 \
-  --evaluator-id accounts/$FIREWORKS_ACCOUNT_ID/evaluators/test-svgagent-test-svg-generation-evaluation \
-  --max-context-length 65536 \
-  --n 8 \
-  --batch-size 128000 \
-  --chunk-size 10 \
-  --epochs 8 \
-  --max-tokens 32768 \
-  --learning-rate 0.00003 \
-  --lora-rank 16 \
-  --accelerator-count 1
+  --evaluator-id test-svgagent-test-svg-generation-evaluation
 ```
 
-### 4. Monitor Training Progress
+> **Training Parameters**: We use Eval Protocol's default values for training parameters (batch size, epochs, learning rate, LoRA rank, accelerator count, etc.). For a complete list of available RFT flags you can customize, see [Fireworks RFT Command Documentation](https://docs.fireworks.ai/tools-sdks/firectl/commands/create-reinforcement-fine-tuning-job).
+> 
+> **Dataset Upload**: The dataset is automatically uploaded from the `svgbench_dataset.jsonl` file referenced in your evaluator. You can confirm the dataset upload at: https://app.fireworks.ai/dashboard/datasets
+
+### 3. Monitor Training Progress
 
 After successful job creation, you'll see:
 
