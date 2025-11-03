@@ -24,7 +24,17 @@ A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the d
 
 1. **Create a Fireworks account**: [https://app.fireworks.ai/account/home](https://app.fireworks.ai/account/home)
 
-2. **Set up API keys in Fireworks Secrets**: Navigate to [fireworks.ai/settings/secrets](https://fireworks.ai/settings/secrets) and add:
+2. **Setup firectl**: [https://docs.fireworks.ai/tools-sdks/firectl/firectl](https://docs.fireworks.ai/tools-sdks/firectl/firectl)
+
+3. **Set up API keys in Fireworks Secrets** - Choose either option:
+
+   **Option A: Command Line** - Use firectl to create the secrets:
+   ```bash
+   firectl create secret --name FIREWORKS_API_KEY --value <your-fireworks-key>
+   firectl create secret --name OPENAI_API_KEY --value <your-openai-key>  # For GPT-4.1 visual judge
+   ```
+
+   **Option B: Web UI** - Navigate to [fireworks.ai/settings/secrets](https://fireworks.ai/settings/secrets) and add:
    - `FIREWORKS_API_KEY` - Your Fireworks API key (same as the one you'll export locally)
    - `OPENAI_API_KEY` - Your OpenAI API key (we use GPT-4.1 as a visual LLM judge for evaluations)
 
@@ -34,13 +44,14 @@ A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the d
 pip install "eval-protocol[svgbench]"
 ```
 
-### Environment Setup
+### Environment Setup for Local Dry Run
 
 Set up your API keys:
 
 ```bash
 export FIREWORKS_API_KEY="<your-fireworks-key>"
 export FIREWORKS_ACCOUNT_ID="<your-fireworks-accountid>"
+export OPENAI_API_KEY="<your-openai-key>"
 ```
 
 ## Running Locally
@@ -84,7 +95,24 @@ pytest evaluator/test_svgagent.py -vs
 
 > See [Vercel CLI documentation](https://vercel.com/docs/cli/dev) for more information on local development.
 
-## How Remote Rollout Processing Works
+### Expected Test Output (for both options):
+
+```
+INFO:eval_protocol.pytest.remote_rollout_processor:Found status log for rollout democratic-way-12: Rollout democratic-way-12 completed
+INFO:eval_protocol.pytest.remote_rollout_processor:Found Fireworks log for rollout democratic-way-12 with status code 100.0
+INFO:eval_protocol.adapters.fireworks_tracing:Successfully converted 1 traces to evaluation rows | 3/8 [00:19<00:22, 4.52s/rollout]
+...
+Runs (Parallel): 100%|████████████████████████████████████████████| 1/1 [00:31<00:00, 31.07s/run]
+PASSED
+```
+
+To view the detailed results, run `ep logs` and navigate to `http://localhost:8000` to see your evaluation data:
+
+<p align="center">
+  <img alt="Eval Protocol Logs Interface" src="assets/ep_logs.png" width="600">
+</p>
+
+### Aside: How Remote Rollout Processing Works
 
 Eval Protocol enables **reinforcement learning that meets you where you are**. Instead of forcing you to rewrite your agent in a specific framework, you can implement a lightweight remote server wherever your codebase and infrastructure already live.
 
@@ -155,12 +183,12 @@ You can inspect individual rollouts to see the dramatic improvement in SVG gener
 
 **Before (1st Epoch):**
 <p align="center">
-  <img alt="SVG Generation - Before Training" src="assets/before.png" width="400">
+  <img alt="SVG Generation - Before Training" src="assets/before.png" width="600">
 </p>
 
 **After (8th Epoch):**
 <p align="center">
-  <img alt="SVG Generation - After Training" src="assets/after.png" width="400">
+  <img alt="SVG Generation - After Training" src="assets/after.png" width="600">
 </p>
 
 The reinforcement fine tuning process significantly improves the model's ability to generate accurate, detailed SVG graphics that better match the input descriptions.

@@ -30,6 +30,9 @@ from eval_protocol.pytest.remote_rollout_processor import RemoteRolloutProcessor
 
 from utils import extract_svg_code, render_svg_to_png
 
+assert os.environ.get("FIREWORKS_API_KEY"), "FIREWORKS_API_KEY environment variable is not set. Please export your Fireworks API key."
+assert os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY environment variable is not set. Please export your OpenAI API key."
+
 logger = logging.getLogger(__name__)
 
 
