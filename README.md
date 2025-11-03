@@ -56,9 +56,13 @@ export OPENAI_API_KEY="<your-openai-key>"
 
 ## Running Locally
 
-### Option A: Using our Vercel Remote Server (Recommended)
+**Terminal 1** - Start the local UI server to view results:
 
-Test the evaluation pipeline with the pre-deployed Vercel server:
+```bash
+ep logs
+```
+
+### Option A: Using our Vercel Remote Server (Recommended)
 
 ```bash
 pytest evaluator/test_svgagent.py -vs
@@ -73,22 +77,21 @@ rollout_processor=RemoteRolloutProcessor(
 
 ### Option B: Local Development Server
 
-For local development and testing:
+In a second terminal:
 
-**Terminal 1** - Start the TypeScript server:
 ```bash
 cd vercel_svg_server_ts
 vercel dev
 ```
 
-**Terminal 2** - Swap out the `remote_base_url` to:
+Then swap out the `remote_base_url` to point to the local server you just started:
 ```
 rollout_processor=RemoteRolloutProcessor(
     remote_base_url="http://localhost:3000",
 )
 ```
 
-Then run the evaluation:
+And in a third terminal, run the evaluation:
 ```bash
 pytest evaluator/test_svgagent.py -vs
 ```
@@ -96,6 +99,8 @@ pytest evaluator/test_svgagent.py -vs
 > See [Vercel CLI documentation](https://vercel.com/docs/cli/dev) for more information on local development.
 
 ### Expected Test Output (for both options):
+
+The test should automatically open a browser page to view results. If it doesn't, navigate to http://localhost:8000.
 
 ```
 INFO:eval_protocol.pytest.remote_rollout_processor:Found status log for rollout democratic-way-12: Rollout democratic-way-12 completed
@@ -105,8 +110,6 @@ INFO:eval_protocol.adapters.fireworks_tracing:Successfully converted 1 traces to
 Runs (Parallel): 100%|████████████████████████████████████████████| 1/1 [00:31<00:00, 31.07s/run]
 PASSED
 ```
-
-To view the detailed results, run `ep logs` and navigate to `http://localhost:8000` to see your evaluation data:
 
 <p align="center">
   <img alt="Eval Protocol Logs Interface" src="assets/ep_logs.png" width="600">
