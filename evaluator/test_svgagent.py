@@ -23,6 +23,7 @@ import asyncio
 
 import litellm
 from pydantic import BaseModel
+from dotenv import load_dotenv
 
 from eval_protocol.models import EvaluateResult, EvaluationRow
 from eval_protocol.pytest import evaluation_test
@@ -30,8 +31,10 @@ from eval_protocol.pytest.remote_rollout_processor import RemoteRolloutProcessor
 
 from utils import extract_svg_code, render_svg_to_png
 
-assert os.environ.get("FIREWORKS_API_KEY"), "FIREWORKS_API_KEY environment variable is not set. Please export your Fireworks API key."
-assert os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY environment variable is not set. Please export your OpenAI API key."
+load_dotenv()
+
+assert os.environ.get("FIREWORKS_API_KEY"), "FIREWORKS_API_KEY environment variable is not set. Please export your Fireworks API key or add to .env file."
+assert os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY environment variable is not set. Please export your OpenAI API key or add to .env file."
 
 logger = logging.getLogger(__name__)
 

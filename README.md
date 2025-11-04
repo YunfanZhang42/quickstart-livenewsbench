@@ -12,7 +12,11 @@
 
 ## Introduction
 
-This repo demonstrates using Eval Protocol and Firework's Reinforcement Fine Tuning (RFT) to create an SVG generation agent.
+This repo demonstrates building an SVG generation agent using reinforcement fine tuning, with the parts:
+
+- **Eval Protocol** - Orchestrates the rollout execution and evaluation framework
+- **Vercel Remote Server** - TypeScript server that handles SVG code generation rollouts
+- **Fireworks RFT** - Reinforcement fine tuning trainer
 
 A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the dataset. SVGBench is a comprehensive benchmark that evaluates language models on their ability to generate SVG code that meets specific visual requirements. Each prompt includes detailed criteria (like "draw a red circle in the top-left corner") that the generated SVG must fulfill.
 
@@ -20,39 +24,18 @@ A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the d
 
 ## Quick Start
 
-### Prerequisites
+### Installation
 
 1. **Create a Fireworks account**: [https://app.fireworks.ai/account/home](https://app.fireworks.ai/account/home)
 
-2. **Setup firectl**: [https://docs.fireworks.ai/tools-sdks/firectl/firectl](https://docs.fireworks.ai/tools-sdks/firectl/firectl)
-
-3. **Set up API keys in Fireworks Secrets** - Choose either option:
-
-   **Option A: Command Line** - Use firectl to create the secrets:
-   ```bash
-   firectl create secret --name FIREWORKS_API_KEY --value <your-fireworks-key>
-   firectl create secret --name OPENAI_API_KEY --value <your-openai-key>  # For GPT-4.1 visual judge
-   ```
-
-   **Option B: Web UI** - Navigate to [fireworks.ai/settings/secrets](https://fireworks.ai/settings/secrets) and add:
-   - `FIREWORKS_API_KEY` - Your Fireworks API key (same as the one you'll export locally)
-   - `OPENAI_API_KEY` - Your OpenAI API key (we use GPT-4.1 as a visual LLM judge for evaluations)
-
-### Installation
-
+2. **Install Eval Protocol**:
 ```bash
 pip install "eval-protocol[svgbench]"
 ```
 
-### Environment Setup for Local Dry Run
+3. **Environment Setup for Local Dry Run**:
 
-Set up your API keys:
-
-```bash
-export FIREWORKS_API_KEY="<your-fireworks-key>"
-export FIREWORKS_ACCOUNT_ID="<your-fireworks-accountid>"
-export OPENAI_API_KEY="<your-openai-key>"
-```
+Make a copy of `.env.example`, name it `.env`, and fill in the keys for `FIREWORKS_API_KEY` and `OPENAI_API_KEY`. Make sure `.env` is under the `/evaluator` folder!
 
 ## Running Locally
 
