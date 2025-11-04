@@ -15,7 +15,7 @@
 This repo demonstrates building an SVG generation agent using reinforcement fine tuning, with the parts:
 
 - **Eval Protocol** - Orchestrates the rollout execution and evaluation framework
-- **Vercel Remote Server** - TypeScript server that handles SVG code generation rollouts
+- **Vercel Typescript Server** - Remote server that handles SVG code generation rollouts
 - **Fireworks RFT** - Reinforcement fine tuning trainer
 
 A big thank you to [SVGBench](https://github.com/johnbean393/SVGBench) for the dataset. SVGBench is a comprehensive benchmark that evaluates language models on their ability to generate SVG code that meets specific visual requirements. Each prompt includes detailed criteria (like "draw a red circle in the top-left corner") that the generated SVG must fulfill.
