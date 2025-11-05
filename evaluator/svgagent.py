@@ -130,7 +130,7 @@ Requirements:
     num_runs=1,
     mode="pointwise",
 )
-async def test_svg_generation_evaluation(row: EvaluationRow) -> EvaluationRow:
+async def svg_generation_evaluation(row: EvaluationRow) -> EvaluationRow:
     """
     SVG generation evaluation.
 
@@ -225,3 +225,9 @@ async def test_svg_generation_evaluation(row: EvaluationRow) -> EvaluationRow:
                     os.unlink(png_path)
             except Exception:
                 pass
+
+
+if __name__ == "__main__":
+    import pytest
+
+    raise SystemExit(pytest.main([__file__, "-vs"]))

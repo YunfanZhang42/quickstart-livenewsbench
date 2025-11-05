@@ -55,7 +55,7 @@ ep logs
 **Terminal 2** - Kick off the test:
 
 ```bash
-pytest evaluator/test_svgagent.py -vs
+python evaluator/svgagent.py
 ```
 
 The test automatically uses our Vercel remote server:
@@ -233,7 +233,7 @@ rollout_processor=RemoteRolloutProcessor(
 
 And in a third terminal, run the evaluation:
 ```bash
-pytest evaluator/test_svgagent.py -vs
+python evaluator/svgagent.py
 ```
 
 > See [Vercel CLI documentation](https://vercel.com/docs/cli/dev) for more information on local development.
