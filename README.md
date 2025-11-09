@@ -46,14 +46,20 @@ pip install "eval-protocol[svgbench]"
 
 3. **Environment Setup**:
 
-Make a copy of `env.example`, name it `.env`, and fill in the keys:
+The `env.example` file is located in the `evaluator/` directory. Make a copy of it in the same directory, name it `.env`, and fill in your API keys:
+
+```bash
+cp evaluator/env.example evaluator/.env
+```
+
+Then edit `evaluator/.env` with your API keys:
 
 ```
 FIREWORKS_API_KEY=your-fireworks-key-here
-OPENAI_API_KEY=your-openai-key-here>
+OPENAI_API_KEY=your-openai-key-here
 ```
 
-This file should be placed in your evaluator directory (e.g., `evaluator/.env`). The create process below will automatically read and upload these secrets to Fireworks.
+The create process below automatically reads and uploads these secrets to Fireworks.
 
 ## Running Locally
 
