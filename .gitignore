@@ -35,3 +35,7 @@ svgbench_debug_intent_matching/
 
 # Evaluator caches
 /evaluator/.cache/
+/.cache/
+/.config/
+
+/.pki/
