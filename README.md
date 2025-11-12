@@ -75,6 +75,8 @@ ep logs
 ep local-test
 ```
 
+This command discovers and runs your `@evaluation_test` with pytest. In this case, it builds an image and runs the test in Docker, because a `Dockerfile` is present.
+
 The test automatically uses our Vercel remote server:
 
 ```
@@ -118,7 +120,8 @@ To kickoff training, simply do:
 cd evaluator
 eval-protocol create rft \
   --base-model accounts/fireworks/models/qwen3-0p6b \
-  --epochs 8
+  --epochs 8 \
+  --chunk-size 10
 ```
 
 This command:
@@ -138,6 +141,7 @@ This command:
 eval-protocol create rft \
   --base-model accounts/fireworks/models/qwen3-0p6b \
   --epochs 8 \
+  --chunk-size 10 \
   --force
 ```
 
