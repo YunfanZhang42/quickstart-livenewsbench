@@ -4,12 +4,15 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
-import { initRequestSchema, InitRequest } from '../src/models/types.js';
-import { Status } from '../src/models/status.js';
-import { mapOpenAIErrorToStatus } from '../src/models/exceptions.js';
+import {
+  initRequestSchema,
+  type InitRequest,
+  Status,
+  mapOpenAIErrorToStatus,
+  createRolloutLogger,
+  withFireworksLogging,
+} from 'eval-protocol';
 import { resolveApiKey } from '../src/config/environment.js';
-import { createRolloutLogger } from '../src/config/logger.js';
-import { withFireworksLogging } from '../src/config/fireworks-vercel.js';
 
 
 async function handler(req: VercelRequest, res: VercelResponse) {
