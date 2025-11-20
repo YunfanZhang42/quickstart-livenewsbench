@@ -1,2 +1,0 @@
-eval-protocol[svgbench]>=0.2.85
-python-dotenv
