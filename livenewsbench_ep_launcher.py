@@ -98,7 +98,7 @@ Just return the letters "A", "B", or "C", with no text around it."""
 
 
 async def evaluate_with_llm_judge(question: str, expected_answer: str, model_answer: str) -> bool:
-    client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"], base_url=os.environ.get("JUDGE_API_BASE_URL", "https://api.openai.com/v1"))
+    client = AsyncOpenAI(api_key=os.environ["JUDGE_API_KEY"], base_url=os.environ.get("JUDGE_API_BASE_URL", "https://api.openai.com/v1"))
 
     # Hard coded to GPT-4.1 for grading the answers.
     correct = False
