@@ -107,20 +107,37 @@ async def evaluate_with_llm_judge(question: str, expected_answer: str, model_ans
         completion = await client.chat.completions.create(
             model=os.environ.get("JUDGE_MODEL_NAME", "gpt-4.1-2025-04-14"),
             messages=[
-                {"role": "user", "content": grading_prompt.format(question=question, expected_answer=expected_answer, answer=model_answer)}
+                {
+                    "role": "user",
+                    "content": grading_prompt.format(
+                        question=question,
+                        expected_answer=expected_answer,
+                        answer=model_answer,
+                    ),
+                }
             ],
             response_format={"type": "text"},
             max_completion_tokens=64,
             temperature=0.0,
             top_p=1.0,
         )
-        response = completion.choices[0].message.content.strip()
 
-        if response == "A":
+        if not completion.choices:
+            logger.error("Judge model returned no choices")
+            return False
+
+        message = completion.choices[0].message
+        response_text = (getattr(message, "content", None) or "").strip()
+
+        if not response_text:
+            logger.error("Judge model returned empty content")
+            return False
+
+        if response_text == "A":
             correct = True
 
     except Exception as e:
-        print(f"Error processing entry {entry}: {e}")
+        logger.error(f"Error calling judge model: {e}", exc_info=True)
 
     return correct
 
@@ -144,13 +161,24 @@ async def evaluate_with_llm_judge(question: str, expected_answer: str, model_ans
 )
 
 async def livenewsbench_eval(row: EvaluationRow) -> EvaluationRow:
+    # Best-effort row identifier for error logging
+    row_id = getattr(getattr(row, "input_metadata", None), "row_id", "unknown")
     try:
         assert row.input_metadata.dataset_info is not None
 
+        if not row.messages:
+            row.evaluation_result = EvaluateResult(
+                score=0.0,
+                reason="No messages present on row (rollout failed before model response)",
+                is_score_valid=False,
+            )
+            return row
+
         # Extract dataset info
-        question = row.input_metadata.dataset_info["question"]
-        expected_answer = row.input_metadata.dataset_info["answer"]
-        row_id = row.input_metadata.dataset_info["id"]
+        dataset_info = row.input_metadata.dataset_info
+        question = dataset_info["question"]
+        expected_answer = dataset_info["answer"]
+        row_id = dataset_info.get("id", row_id)
         model_response = row.messages[-1].content
 
         # Run LLM judge evaluation

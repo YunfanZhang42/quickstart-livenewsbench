@@ -394,28 +394,32 @@ Now, let's think step by step to determine the next action to take."""
                 response = self.model.generate(messages)
                 messages.append({"role": "assistant", "content": response})
             except Exception as e:
+                # Mark entry as failed and propagate error so the rollout
+                # is correctly marked as errored in Eval Protocol / Fireworks.
                 print(f"Model generation failed: {e}. Ending execution.")
-                entry = self.update_entry(
+                self.update_entry(
                     entry,
                     search_final_answer="",
                     finish_reason="model_generation_failure",
                     task_history=messages,
                     used_searches=used_searches,
-                    used_clicks=used_clicks
+                    used_clicks=used_clicks,
                 )
-                return entry
+                entry["status"] = "failed"
+                raise
 
             if "<action>" not in response or "</action>" not in response:
                 print("No action block found in the response. Ending execution.")
-                entry = self.update_entry(
+                self.update_entry(
                     entry,
                     search_final_answer="",
                     finish_reason="no_action_block",
                     task_history=messages,
                     used_searches=used_searches,
-                    used_clicks=used_clicks
+                    used_clicks=used_clicks,
                 )
-                return entry
+                entry["status"] = "failed"
+                raise RuntimeError("No action block found in model response.")
 
             action_block = response.split("<action>")[1].split("</action>")[0].strip()
             action_lines = action_block.splitlines()
@@ -425,15 +429,16 @@ Now, let's think step by step to determine the next action to take."""
                 queries = [line.strip() for line in action_lines[1:] if line.strip()]
                 if used_searches + len(queries) > self.max_searches:
                     print("Exceeded maximum number of searches allowed. Ending execution.")
-                    entry = self.update_entry(
+                    self.update_entry(
                         entry,
                         search_final_answer="",
                         finish_reason="exceeded_search_budget",
                         task_history=messages,
                         used_searches=used_searches,
-                        used_clicks=used_clicks
+                        used_clicks=used_clicks,
                     )
-                    return entry
+                    entry["status"] = "failed"
+                    raise RuntimeError("Exceeded maximum number of searches allowed.")
 
                 search_results = []
                 for query in queries:
@@ -441,16 +446,16 @@ Now, let's think step by step to determine the next action to take."""
                         search_response = self.search_tool.search(query, domain_blocklist=url_to_avoid)
                     except Exception as e:
                         print(f"Search failed for query '{query}': {e}. Ending execution.")
-                        entry["finish_reason"] = "search_failure"
-                        entry = self.update_entry(
+                        self.update_entry(
                             entry,
                             search_final_answer="",
                             finish_reason="search_failure",
                             task_history=messages,
                             used_searches=used_searches,
-                            used_clicks=used_clicks
+                            used_clicks=used_clicks,
                         )
-                        return entry
+                        entry["status"] = "failed"
+                        raise
 
                     results = search_response.get("results", [])
                     formatted_results = "\n\n".join([
@@ -496,15 +501,16 @@ Now, let's think step by step to determine the next action to take."""
                 urls = [line.strip() for line in action_lines[1:] if line.strip()]
                 if used_clicks + len(urls) > self.max_clicks:
                     print("Exceeded maximum number of clicks allowed. Ending execution.")
-                    entry = self.update_entry(
+                    self.update_entry(
                         entry,
                         search_final_answer="",
                         finish_reason="exceeded_click_budget",
                         task_history=messages,
                         used_searches=used_searches,
-                        used_clicks=used_clicks
+                        used_clicks=used_clicks,
                     )
-                    return entry
+                    entry["status"] = "failed"
+                    raise RuntimeError("Exceeded maximum number of clicks allowed.")
                 
                 click_results = []
                 for url in urls:
@@ -536,26 +542,28 @@ Now, let's think step by step to determine the next action to take."""
                 return entry
             else:
                 print(f"Unknown action type: {action_type}. Ending execution.")
-                entry = self.update_entry(
+                self.update_entry(
                     entry,
                     search_final_answer="",
                     finish_reason="unknown_action_type",
                     task_history=messages,
                     used_searches=used_searches,
-                    used_clicks=used_clicks
+                    used_clicks=used_clicks,
                 )
-                return entry
+                entry["status"] = "failed"
+                raise RuntimeError(f"Unknown action type: {action_type}")
             
         print("Reached maximum number of iterations without finishing. Ending execution.")
-        entry = self.update_entry(
+        self.update_entry(
             entry,
             search_final_answer="",
             finish_reason="max_turns_reached",
             task_history=messages,
             used_searches=used_searches,
-            used_clicks=used_clicks
+            used_clicks=used_clicks,
         )
-        return entry
+        entry["status"] = "failed"
+        raise RuntimeError("Reached maximum number of iterations without finishing.")
 
 
 @app.post("/init")
